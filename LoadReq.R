@@ -21,7 +21,7 @@ library(openxlsx)
 library(gplots)
 library(SCENIC)
 	
-source("https://raw.githubusercontent.com/GildasLepennetier/R-stuff/main/not_in.R")
+source("https://raw.githubusercontent.com/GildasLepennetier/R-stuff/master/not_in.R")
 source("https://raw.githubusercontent.com/GildasLepennetier/SCr/main/FAM.R")
 source("https://raw.githubusercontent.com/GildasLepennetier/SCr/main/ANN.R")
 source("https://raw.githubusercontent.com/GildasLepennetier/SCr/main/DOT.R")
