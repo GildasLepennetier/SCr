@@ -6,6 +6,7 @@ CChat<-function(){
 	for( ORIGIN in unique( GEX$Condition ) ) {
 		
 		GEX <- subset( GEX.backup, Condition == ORIGIN)
+		GEX$CellTypeFinal<-factor(GEX$CellTypeFinal)
 		
 		for( SELECT in c("Secreted Signaling","Cell-Cell Contact","ECM-Receptor")){
 			OUTDIR=paste0('15_cellchat_',ORIGIN,"_",gsub(" ","",SELECT)) ; dir.create(OUTDIR,showWarnings = F)
