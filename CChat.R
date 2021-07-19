@@ -2,26 +2,20 @@
 # Jin et al. (2020)
 CChat<-function(){
 	options(stringsAsFactors = FALSE) # !!!!
-	NAMEIDENT="CellTypeFinal" #"annot_RNA_snn_res.0.1_CIPR" 
-	for( ORIGIN in unique( GEX$Condition ) ) {
-		
+	for( ORIGIN in CONDITIONS ) {
 		GEX <- subset( GEX.backup, Condition == ORIGIN)
-		GEX$CellTypeFinal<-factor(GEX$CellTypeFinal)
-		
-		for( SELECT in c("Secreted Signaling","Cell-Cell Contact","ECM-Receptor")){
-			OUTDIR=paste0('15_cellchat_',ORIGIN,"_",gsub(" ","",SELECT)) ; dir.create(OUTDIR,showWarnings = F)
-			print(paste(">>>>>>>>> Currently:",OUTDIR))
-			### setup
-			DATABASE="CellChatDB.mouse"
-			PPI=PPI.mouse
+		for( INTERTYPE in INTERTYPES){
 			
+			OUTDIR=paste0('15_cellchat_',ORIGIN,"_",gsub(" ","",INTERTYPE)) ; dir.create(OUTDIR,showWarnings = F)
+			print(paste(">>>>>>>>> Currently:",OUTDIR))
+
 			# setup object
 			# in the future, when no bugs
-			#cellchat <- createCellChat(object = GEX)
-			
+			#cellchat <- createCellChat(object=GEX)
 			Idents(GEX)<-NAMEIDENT
-			cellchat <- createCellChat(object = GetAssayData(GEX,assay="RNA",slot="data"),meta=GEX@meta.data,group.by=NAMEIDENT)
-			cellchat@DB <- subsetDB(CellChatDB.mouse,search=SELECT) # use Secreted Signaling for cell-cell communication analysis
+			cellchat <- createCellChat(object=GetAssayData(GEX,assay="RNA",slot="data"),meta=GEX@meta.data,group.by=NAMEIDENT)
+			cellchat@DB <- subsetDB(CellChatDB,search=INTERTYPE) # use Secreted Signaling for cell-cell communication analysis
+			#cellchat@idents<-factor(cellchat@idents)
 			
 			# process (warning: use the proper input data ~ species: PPI.mouse)
 			if(T){
@@ -34,20 +28,14 @@ CChat<-function(){
 				cellchat <- identifyOverExpressedGenes(cellchat)	
 				cellchat <- identifyOverExpressedInteractions(cellchat)
 				cellchat <- projectData(cellchat,PPI)
-				
-				
 				#Inference of cell-cell communication network
-				cellchat <- computeCommunProb(cellchat) #,raw.use=F,trim=0.1,type="truncatedMean",population.size=T)
-				
+				cellchat <- computeCommunProb(cellchat,raw.use=F,do.fast=T) #,raw.use=F,trim=0.1,type="truncatedMean",population.size=T)
 				# Filter out the cell-cell communication if there are only few number of cells in certain cell groups
 				cellchat <- filterCommunication(cellchat,min.cells=10)
-				
 				#Infer the cell-cell communication at a signaling pathway level
 				cellchat <- computeCommunProbPathway(cellchat)
-				
 				#Calculate the aggregated cell-cell communication network
 				cellchat <- aggregateNet(cellchat)
-				
 				saveRDS(cellchat, paste0(OUTDIR,"/cellchat.mouse.Rds"))
 			}
 			#extract signif interaction - save in excel
@@ -61,7 +49,7 @@ CChat<-function(){
 				if( exists("df.net") ) { write.xlsx(df.net,paste0(OUTDIR,"/","df.net.xlsx")) }else{print("no df.net")}
 				
 			}
-		
+			
 			rm(df.net,cellchat)
 			try({ df.net<-read.xlsx(paste0(OUTDIR,"/","df.net.xlsx")) })
 			
@@ -184,7 +172,7 @@ CChat<-function(){
 			#clean
 			rm(cellchat,SIGNALING)
 		}
-		rm(GEX,ORIGIN,SELECT,OUTDIR,df.net,PPI,DATABASE)
+		rm(GEX,ORIGIN,INTERTYPE,OUTDIR,df.net,PPI,DATABASE)
 	}
 	options(stringsAsFactors = TRUE)
 }
