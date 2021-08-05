@@ -6,7 +6,7 @@ DOT<-function(){
 	#DefaultAssay(GEX)
 	Idents(GEX)<-NAMEIDENT
 	IDENTS = unique(Idents(GEX))
-	PLOT=DotPlot(GEX,features=FEATURES,assay="RNA",idents=IDENTS,dot.scale=10,scale=F) + 
+	PLOT=DotPlot(GEX,features=FEATURES,assay="RNA",idents=IDENTS,dot.scale=10,scale=T) + 
 		theme_minimal(base_size=20) + 
 		theme(axis.text.x=element_text(angle=90)) + 
 		ggtitle("Gene markers")
